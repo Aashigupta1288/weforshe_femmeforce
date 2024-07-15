@@ -1,0 +1,237 @@
+{% load static %}
+{% include 'frontend/includes/header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+  /* background-color: rgb(73, 75, 184); */
+  /* background-image: linear-gradient(-10deg, #3d4e81 0%, #5753c9 58%, #6e7ff3 100%); */
+  background-image: url("/static/assets/images/avatar/blue.jpg");
+  background-size: 2000px 2000px;
+  
+  /* background-repeat: no-repeat; */
+  /* background-attachment: fixed; */
+  font-family: Arial, sans-serif;
+}
+
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 2em;
+}
+
+#box {
+  background-color: rgba(150, 152, 247, 0.455);
+  border-radius: 20px;
+  text-align: center;
+  height: 700px;
+  width: 700px;
+  margin-right: 2em;
+}
+
+#heading {
+  font-size: 30px;
+  text-align: center;
+  color: snow;
+  text-shadow: 0px 4px 5px rgb(24, 25, 88);
+  font-family: "j'aime le poisson !", "Trebuchet ms";
+}
+
+#backdrop {
+  margin: 50px;
+  position: relative;
+  background-color: rgb(246, 240, 255);
+  border-radius: 20px;
+  height: 600px;
+  width: 600px;
+}
+
+.buttonBox {
+  display: flex;
+  margin: 15px;
+  flex-direction: column;
+}
+
+button {
+  margin: 1em 0;
+  color: black;
+  background-color: rgb(243, 240, 255);
+  box-shadow: 0px 1px 2px 1px rgb(73, 75, 184);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: larger;
+  transition: 0.1s linear;
+}
+
+button:hover {
+  background-color: rgb(248, 252, 255);
+  box-shadow: 0px 2px 4px 1px rgb(73, 75, 184);
+}
+
+#skin, #face, #hair, #top, #bottom, #shoes, #accessory {
+  background-repeat: no-repeat;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-size: contain;
+  background-position: center;
+}
+
+/* Skin classes */
+.skin0 { background-image: url("/static/assets/images/avatar/mpic/skin0.png"); }
+.skin1 { background-image: url("/static/assets/images/avatar/mpic/skin1.png"); }
+.skin2 { background-image: url("/static/assets/images/avatar/mpic/skin2.png"); }
+
+/* Top classes */
+.top0 { background-image: url("/static/assets/images/avatar/mpic/top0.png"); }
+.top1 { background-image: url("/static/assets/images/avatar/mpic/top1.png"); }
+.top2 { background-image: url("/static/assets/images/avatar/mpic/top2.png"); }
+.top3 { background-image: url("/static/assets/images/avatar/mpic/top3.png"); }
+.top4 { background-image: url("/static/assets/images/avatar/mpic/top4.png"); }
+.top5 { background-image: url("/static/assets/images/avatar/mpic/top5.png"); }
+.top6 { background-image: url("/static/assets/images/avatar/mpic/top6.png"); }
+.top7 { background-image: url("/static/assets/images/avatar/mpic/top7.png"); }
+.top8 { background-image: url("/static/assets/images/avatar/mpic/top8.png"); }
+.top9 { background-image: url("/static/assets/images/avatar/mpic/top9.png"); }
+.top10 { background-image: url("/static/assets/images/avatar/mpic/top10.png"); }
+
+/* Bottom classes */
+.bottom0 { background-image: url("/static/assets/images/avatar/mpic/bottom0.png"); }
+.bottom1 { background-image: url("/static/assets/images/avatar/mpic/bottom1.png"); }
+.bottom2 { background-image: url("/static/assets/images/avatar/mpic/bottom2.png"); }
+.bottom3 { background-image: url("/static/assets/images/avatar/mpic/bottom3.png"); }
+.bottom4 { background-image: url("/static/assets/images/avatar/mpic/bottom4.png"); }
+.bottom5 { background-image: url("/static/assets/images/avatar/mpic/bottom5.png"); }
+.bottom6 { background-image: url("/static/assets/images/avatar/mpic/bottom6.png"); }
+.bottom7 { background-image: url("/static/assets/images/avatar/mpic/bottom7.png"); }
+.bottom8 { background-image: url("/static/assets/images/avatar/mpic/bottom8.png"); }
+
+/* Hair classes */
+.hair0 { background-image: url("/static/assets/images/avatar/mpic/hair0.png"); }
+.hair1 { background-image: url("/static/assets/images/avatar/mpic/hair1.png"); }
+.hair2 { background-image: url("/static/assets/images/avatar/mpic/hair2.png"); }
+.hair3 { background-image: url("/static/assets/images/avatar/mpic/hair3.png"); }
+
+/* Face classes */
+.face0 { background-image: url("/static/assets/images/avatar/mpic/face0.png"); }
+.face1 { background-image: url("/static/assets/images/avatar/mpic/face1.png"); }
+.face2 { background-image: url("/static/assets/images/avatar/mpic/face2.png"); }
+.face3 { background-image: url("/static/assets/images/avatar/mpic/face3.png"); }
+
+/* Shoes classes */
+.shoes0 { background-image: url("/static/assets/images/avatar/mpic/shoes0.png"); }
+.shoes1 { background-image: url("/static/assets/images/avatar/mpic/shoes1.png"); }
+
+/* Accessory classes */
+.access0 { background-image: url("/static/assets/images/avatar/mpic/access0.png"); }
+.access1 { background-image: url("/static/assets/images/avatar/mpic/access1.png"); }
+.access2 { background-image: url("/static/assets/images/avatar/mpic/access2.png"); }
+
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Male Avatar Creator</title>
+</head>
+<body>
+    <h1 id="heading">Create your Avatar</h1>
+    <div id="container">
+        <div id="box">
+            <div id="backdrop">
+                <div id="skin"></div>
+                <div id="face"></div>
+                <div id="hair"></div>
+                <div id="top"></div>
+                <div id="bottom"></div>
+                <div id="shoes"></div>
+                <div id="accessory"></div>
+            </div>
+        </div>
+        <div class="buttonBox">
+            <button id="nextskin">Skin </button>
+            <button id="nextface">Face </button>
+            <button id="nexthair">Hair </button>
+            <button id="nexttop">Top </button>
+            <button id="nextbottom">Bottom </button>
+            <button id="nextshoes">Shoes </button>
+            <button id="nextaccessory">Accessory </button>
+        </div>
+    </div>
+
+    <button class="buttonBox" style="margin-left: 650px;">Submit</button>
+    <br>
+    {% include 'frontend/includes/footer.html' %}
+    
+    <script>
+        let state = {
+    skin: 0,
+    top: 0,
+    bottom: 0,
+    hair: 0,
+    accessory: 0,
+    shoes: 0,
+    face: 0,
+};
+
+function updateClass(elementId, classNamePrefix, stateValue, maxState) {
+    let element = document.querySelector(`#${elementId}`);
+    if (stateValue < maxState) {
+        stateValue++;
+    } else {
+        stateValue = 0;
+    }
+    element.setAttribute("class", `${classNamePrefix}${stateValue}`);
+    return stateValue;
+}
+
+function nextSkin() {
+    state.skin = updateClass("skin", "skin", state.skin, 3); // Adjust based on the number of skin options
+}
+
+function nextTop() {
+    state.top = updateClass("top", "top", state.top, 11); // Adjust based on the number of top options
+}
+
+function nextBottom() {
+    state.bottom = updateClass("bottom", "bottom", state.bottom, 9); // Adjust based on the number of bottom options
+}
+
+function nextHair() {
+    state.hair = updateClass("hair", "hair", state.hair, 4); // Adjust based on the number of hair options
+}
+
+function nextAccessory() {
+    state.accessory = updateClass("accessory", "access", state.accessory, 3); // Adjust based on the number of accessory options
+}
+
+function nextShoes() {
+    state.shoes = updateClass("shoes", "shoes", state.shoes, 2); // Adjust based on the number of shoes options
+}
+
+function nextFace() {
+    state.face = updateClass("face", "face", state.face, 3); // Adjust based on the number of face options
+}
+
+document.getElementById("nextskin").addEventListener("click", nextSkin);
+document.getElementById("nextface").addEventListener("click", nextFace);
+document.getElementById("nexthair").addEventListener("click", nextHair);
+document.getElementById("nexttop").addEventListener("click", nextTop);
+document.getElementById("nextbottom").addEventListener("click", nextBottom);
+document.getElementById("nextshoes").addEventListener("click", nextShoes);
+document.getElementById("nextaccessory").addEventListener("click", nextAccessory);
+
+// Initialize the avatar components
+nextSkin();
+nextFace();
+nextHair();
+nextTop();
+nextBottom();
+nextShoes();
+nextAccessory();
+
+    </script>
+</body>
+</html>

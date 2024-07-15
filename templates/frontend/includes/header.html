@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="robots" content="index, follow" />
+    <title>Myntra</title>
+    <meta name="description" content="Star street - Fashoin eCommerce HTML Template" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Add site Favicon -->
+    <link rel="shortcut icon" href="https://aartisto.com/wp-content/uploads/2020/11/myntra.png" type="image/png">
+
+    <!-- vendor css (Icon Font) -->
+    <link rel="stylesheet" href="{% static 'assets/css/vendor/bootstrap.bundle.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/vendor/pe-icon-7-stroke.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/vendor/font.awesome.css' %}" />
+
+    <!-- plugins css (All Plugins Files) -->
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/animate.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/swiper-bundle.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/jquery-ui.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/nice-select.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/venobox.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/flash.css' %}" />
+
+</head>
+<div class="header-to-bar"> HELLO EVERYONE! WELCOME TO MYNTRA</div>
+
+<header>
+    <div class="header-main sticky-nav ">
+        <div class="container position-relative">
+            <div class="row">
+                <div class="col-auto align-self-center">
+                    <div class="header-logo">
+                        <a href="{% url 'frontend:index' %}"><img src="https://aartisto.com/wp-content/uploads/2020/11/myntra.png" alt="Site Logo" style="height:100px;width:100px" ></a>
+                    </div>
+                </div>
+                <div class="col align-self-center d-none d-lg-block">
+                    <div class="main-menu">
+                        <ul>
+                            <li><a href="{% url 'frontend:index' %}">Home</a></li>
+                            <li class="dropdown position-static"><a href="#">Shop <i
+                                        class="pe-7s-angle-down"></i></a>
+                                <ul class="mega-menu d-block">
+                                    <li class="d-flex">
+                                        {% for i in shop_data %}
+                                        
+                                        <ul class="d-block">
+
+                                            <li class="title"><a href="#">{{i.name}}</a></li>
+                                            {% for j in i.sub_cat %}
+                                            
+                                                <li><a href="{% url 'products:shop' j.id %}">{{j.name}}</a></li>
+                                            {% endfor %}
+                                            
+                                        </ul>
+                                        {% endfor %}
+                                        
+                                    </li>
+                                    
+                                </ul>
+                            </li>
+                            <li><a href="{% url 'blog:blog_list' %}">Blog</a></li>
+                            <li><a href="{% url 'frontend:about' %}">About us</a></li>
+                            <li><a href="{% url 'frontend:contact_us' %}">Contact us</a></li>
+                            <li><a href="{% url 'frontend:gender'%}">STYLE YOUR AVATAR</a></li>
+
+                    
+
+                        </ul>
+                    </div>
+                </div>
+                <!-- Header Action Start -->
+                <div class="col col-lg-auto align-self-center pl-0">
+                    <div class="header-actions">
+                        {% if request.user.is_authenticated and request.user.role_id == 2  %}
+                            <a href="{% url 'frontend:my_account' %}" class="header-action-btn ">
+                                <i class="pe-7s-user"></i>
+                            </a>
+                        {% else %}
+                        <a href="{% url 'frontend:login' %}" class="header-action-btn login-btn" data-bs-toggle="modal"
+                        data-bs-target="#loginActive">Sign In</a>
+                        {% endif %}
+                        
+                        <!-- Single Wedge Start -->
+                        {% comment %} <a href="#" class="header-action-btn" data-bs-toggle="modal" data-bs-target="#searchActive">
+                            <i class="pe-7s-search"></i>
+                        </a> {% endcomment %}
+                        <!-- Single Wedge End -->
+                        <!-- Single Wedge Start -->
+                        
+                        
+                        <a href="#offcanvas-wishlist"
+                            class="header-action-btn header-action-btn-cart offcanvas-toggle pr-0">
+                            <i class="pe-7s-like"></i>
+                            {% if wish_list.count > 0 %}
+                                <span class="header-action-num">{{wish_list.count}}</span>
+                            {% endif %}
+                            <!-- <span class="cart-amount">€30.00</span> -->
+                        </a>
+                        <!-- Single Wedge End -->
+                        <a href="#offcanvas-cart"
+                            class="header-action-btn header-action-btn-cart offcanvas-toggle pr-0">
+                            <i class="pe-7s-shopbag"></i>
+                            {% if wish_list.count > 0 %}
+                                <span class="header-action-num">{{cart_list.count}}</span>
+                            {% endif %}
+                            
+                            <!-- <span class="cart-amount">€30.00</span> -->
+                        </a>
+                        <a href="#offcanvas-mobile-menu"
+                            class="header-action-btn header-action-btn-menu offcanvas-toggle d-lg-none">
+                            <i class="pe-7s-menu"></i>
+                        </a>
+                    </div>
+                    <!-- Header Action End -->
+                </div>
+            </div>
+        </div>
+</header>
+<div class="offcanvas-overlay"></div>
+
+<!-- OffCanvas Wishlist Start -->
+<div id="offcanvas-wishlist" class="offcanvas offcanvas-wishlist">
+    <div class="inner">
+        <div class="head">
+            <span class="title">Wishlist</span>
+            <button class="offcanvas-close">×</button>
+        </div>
+        <div class="body customScroll">
+            <ul class="minicart-product-list">
+                {% for i in wish_list %}
+                <li>
+                    {% with product_image=i.product.productimage_set.first %}
+                        {% if product_image %}
+                            <img style="width: 30% !important" src="{{ product_image.image.url }}" alt="Product Image">
+                        {% else %}
+                            <p>No images available for this product in the wishlist.</p>
+                        {% endif %}
+                    {% endwith %}
+                    <div class="content">
+                        <a href="" class="title">{{i.product.name}}</a>
+                        <span class="quantity-price">1 x <span class="amount">${% if i.product.discount %}{{i.product.discount}}{% else %} {{i.product.price}}{% endif %}</span></span>
+                        {% comment %} <a href="#" class="remove">×</a> {% endcomment %}
+                    </div>
+                </li>
+                {% endfor %}
+                
+            </ul>
+        </div>
+        {% if wish_list %}
+        <div class="foot">
+            <div class="buttons">
+                <a href="{% url 'products:user_wishlist' %}" class="btn btn-dark btn-hover-primary mt-30px">view wishlist</a>
+            </div>
+        </div>
+        {% else %}
+            <p align-center>No Items in you Wishlist<p>
+        {% endif %}
+    </div>
+</div>
+<!-- OffCanvas Wishlist End -->
+<!-- OffCanvas Cart Start -->
+<div id="offcanvas-cart" class="offcanvas offcanvas-cart">
+    <div class="inner">
+        <div class="head">
+            <span class="title">Cart</span>
+            <button class="offcanvas-close">×</button>
+        </div>
+        <div class="body customScroll">
+            <ul class="minicart-product-list">
+                {% for i in cart_list %}
+                <li>
+                    {% with product_image=i.product.productimage_set.first %}
+                        {% if product_image %}
+                            <a href="{% url 'products:shop_product_detail' i.product.id %}" class="image"><img src="{{ product_image.image.url }}"
+                                alt="Cart product Image"></a>
+                        {% else %}
+                            <p>No images available for this product in the wishlist.</p>
+                        {% endif %}
+                    {% endwith %}
+                   
+                    <div class="content">
+                        <a href="{" class="title">{{i.product.name}}</a>
+                        <span class="quantity-price">1 x <span class="amount">${% if i.product.discount %}{{i.product.discount}}{% else %} {{i.product.price}}{% endif %}</span></span>
+                        <a href="#" class="remove">×</a>
+                    </div>
+                </li>
+                {% endfor %}
+                
+                
+                </li>
+            </ul>
+        </div>
+        {% if cart_list %}
+        <div class="foot">
+            <div class="buttons mt-30px">
+                <a href="{% url 'products:cart_details' %}" class="btn btn-dark btn-hover-primary mb-30px">view cart</a>
+            </div>
+        </div>
+        {% else %}
+        <p align-center>No Items in you cart<p>
+        {% endif %}
+    </div>
+</div>
+{% if messages %}
+    <div class="flash animate--drop-in-fade-out">
+    {% for message in messages %}
+        <div class="flash__icon">
+            <i class="icon far fa-check-circle"></i>
+        </div>
+        
+        <p class="flash__body">
+            {{ message }}
+        </p>
+        {% endfor %}
+    </div>
+{% endif %}
+<!-- OffCanvas Cart End -->

@@ -1,0 +1,226 @@
+from accounts.models import *
+from products.models import *
+from django.contrib import messages
+from django.http import JsonResponse
+from django.db.models import Avg , Count
+from django.shortcuts import render,redirect
+
+from django.db.models import F
+from django.db.models.functions import RowNumber
+from django.db.models import Window
+from django.shortcuts import render
+
+
+def index(request):
+    if request.user.is_authenticated and request.user.is_superuser and (request.user.role_id == 1 ):
+        return redirect('admin:index')
+    else:
+        try:
+            wishlist_products = Wishlist.objects.filter(created_by=request.user).values_list('product', flat=True)
+        except:
+            wishlist_products = None
+        try:
+            cart_list = CartItem.objects.filter(created_by = request.user)
+        except:
+            cart_list = None
+        rating = Ratings.objects.filter(rating__gt = 4).order_by('-id')[0:3]
+        try:
+            wish_list = Wishlist.objects.filter(created_by = request.user)
+        except:
+            wish_list = None
+
+        all_products = Product.objects.all().annotate(
+            rating_count=Count('ratings'),
+            avg_rating=Avg('ratings__rating')
+        ).order_by('id')[0:8]
+        for product in all_products:
+            if product.avg_rating is not None:
+                product.avg_rating *= 20
+            else:
+                product.avg_rating = 0
+
+
+        new_products = Product.objects.all().annotate(
+            rating_count=Count('ratings'),
+            avg_rating=Avg('ratings__rating')
+        ).order_by('-id')[0:8]
+        for product in new_products:
+            if product.avg_rating is not None:
+                product.avg_rating *= 20
+            else:
+                product.avg_rating = 0
+
+        discounted_products =  Product.objects.filter(discount__isnull = False).annotate(
+            rating_count=Count('ratings'),
+            avg_rating=Avg('ratings__rating')
+        ).order_by('-id')[0:8]
+        for product in discounted_products:
+            if product.avg_rating is not None:
+                product.avg_rating *= 20
+            else:
+                product.avg_rating = 0
+
+        shop_data = []
+        category = Category.objects.all()
+        for i in category:
+            s_c = []
+            sub_cats = SubCategory.objects.filter(category_id = i.id )
+            for j in sub_cats:
+                s_c.append({"name":j.name,"id":j.id})
+            shop_data.append({
+                "name":i.name,
+                "sub_cat":s_c
+            })
+        
+        cat_id,cat_name,cat_image,cat_items=[],[],[],[]
+        for cat in category:
+            cat_id.append(cat.id)
+            cat_name.append(cat.name)
+            cat_image.append(cat.image.url)
+            product = Product.objects.filter(sub_category__category = cat ).count()
+            cat_items.append(product)
+        try:
+            # view_list = []
+            view = ProdutHistory.objects.filter(created_by=request.user).last()
+            # for i in view:
+            #     view_list.append(i.project.id)
+
+
+            history = ProdutHistory.objects.filter(created_by=request.user).annotate(row_number=Window(expression=RowNumber(),order_by=F('id').desc())).filter(row_number__lte=3)
+            
+            product_history = Product.objects.filter(sub_category_id__in = history.values_list("project__sub_category")).exclude(id = view.project.id)
+        except:
+            product_history = ""
+
+        print(product_history,">>>>>>>>")
+        data = zip(cat_id,cat_name,cat_image,cat_items)
+        return render(request, 'frontend/index.html',{"data":data,"products":all_products,"new_products":new_products,"product_history":product_history,
+                                                    "discounted_products":discounted_products,"wish_list":wish_list,"rating":rating,
+                                                    "wishlist_products":wishlist_products,"cart_list":cart_list,"shop_data":shop_data})
+    
+def about(request):
+    shop_data = []
+    category = Category.objects.all()
+    for i in category:
+        s_c = []
+        sub_cats = SubCategory.objects.filter(category_id = i.id )
+        for j in sub_cats:
+            s_c.append({"name":j.name,"id":j.id})
+        print(sub_cats)
+        shop_data.append({
+            "name":i.name,
+            "sub_cat":s_c
+        })
+        
+    rating = Ratings.objects.filter(rating__gt = 4).order_by('-id')[0:3]
+    try:
+        cart_list = CartItem.objects.filter(created_by = request.user)
+    except:
+        cart_list = None
+    try:
+        wish_list = Wishlist.objects.filter(created_by = request.user)
+    except:
+        wish_list = None
+    return render(request, 'frontend/about.html',{"wish_list":wish_list,"rating":rating,"cart_list":cart_list,"shop_data":shop_data})
+
+def contact(request):
+    shop_data = []
+    category = Category.objects.all()
+    for i in category:
+        s_c = []
+        sub_cats = SubCategory.objects.filter(category_id = i.id )
+        for j in sub_cats:
+            s_c.append({"name":j.name,"id":j.id})
+        print(sub_cats)
+        shop_data.append({
+            "name":i.name,
+            "sub_cat":s_c
+        })
+        
+    try:
+        wish_list = Wishlist.objects.filter(created_by = request.user)
+    except:
+        wish_list = None
+    try:
+        cart_list = CartItem.objects.filter(created_by = request.user)
+    except:
+        cart_list = None
+    if request.method == "POST":
+        contact = ContactUs.objects.create(name = request.POST.get("name"),
+                                           email = request.POST.get("email"),
+                                           message = request.POST.get("message"))
+        messages.success(request, 'Thank you for you enquiry, We will get back to you soon')
+        return redirect('frontend:contact_us')
+        
+    
+    return render(request, 'frontend/contact.html',{"wish_list":wish_list,"cart_list":cart_list,"shop_data":shop_data})
+
+def login(request):
+    return render(request, 'frontend/login.html')
+
+def product_list(request):
+
+    return render(request, 'frontend/shop-left-sidebar.html')
+
+def my_account(request):
+    shop_data = []
+    category = Category.objects.all()
+    for i in category:
+        s_c = []
+        sub_cats = SubCategory.objects.filter(category_id = i.id )
+        for j in sub_cats:
+            s_c.append({"name":j.name,"id":j.id})
+        print(sub_cats)
+        shop_data.append({
+            "name":i.name,
+            "sub_cat":s_c
+        })
+        
+    try:
+        wish_list = Wishlist.objects.filter(created_by = request.user)
+    except:
+        wish_list = None
+    try:
+        cart_list = CartItem.objects.filter(created_by = request.user)
+    except:
+        cart_list = None
+    user = User.objects.get(id = request.user.id)
+    if request.method == "POST":
+        if request.POST.get("first_name"):
+            user.first_name = request.POST.get("first_name")
+            
+        if request.POST.get("last_name"):
+            user.last_name = request.POST.get("last_name")
+
+        if request.POST.get("mobile_no"):
+            user.mobile_no = request.POST.get("mobile_no")
+
+        if request.POST.get("dob"):
+            user.dob = request.POST.get("dob")
+        user.save()
+        messages.success(request, 'Profile updated successfully')
+    return render(request, 'frontend/my-account.html',{"wish_list":wish_list,"cart_list":cart_list,"shop_data":shop_data})
+
+def get_product_details(request, product_id):
+    product = Product.objects.get(pk=product_id)
+    product_data = {
+        'name': product.name,
+        'description': product.description,
+        # Add more fields as needed
+    }
+    return JsonResponse(product_data)
+
+def gender(request):
+    return render(request, 'frontend/gender.html')
+
+def maleavatar(request):
+    return render(request, 'frontend/maleavatar.html')
+
+def avatar(request):
+    return render(request, 'frontend/avatar.html')
+
+def voucher(request):
+    return render(request, 'frontend/voucher.html')
+
+def buslogin(request):
+    return render(request, 'frontend/buslogin.html')

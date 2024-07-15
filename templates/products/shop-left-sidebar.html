@@ -1,0 +1,363 @@
+{% load static %}
+{% include 'frontend/includes/header.html' %}
+
+    <!-- breadcrumb-area start -->
+    <div class="breadcrumb-area">
+        <div class="container">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-12 text-center">
+                    <h2 class="breadcrumb-title">Shop</h2>
+                    <!-- breadcrumb-list start -->
+                    <ul class="breadcrumb-list">
+                        <li class="breadcrumb-item"><a href="{% url 'frontend:index' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Shop</li>
+                    </ul>
+                    <!-- breadcrumb-list end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- breadcrumb-area end -->
+
+    <!-- Shop Page Start  -->
+    <div class="shop-category-area pt-100px pb-100px">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9 order-lg-last col-md-12 order-md-first">
+                    <!-- Shop Top Area Start -->
+                    <div class="shop-top-bar d-flex">
+                        <!-- Left Side start -->
+                        <p><span>{{products.count}}</span> Product Found  <span></span></p>
+                        <!-- Left Side End -->
+                        <div class="shop-tab nav">
+                            <a class="active" href="#shop-grid" data-bs-toggle="tab">
+                                <i class="fa fa-th" aria-hidden="true"></i>
+                            </a>
+                            <a href="#shop-list" data-bs-toggle="tab">
+                                <i class="fa fa-list" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                        <!-- Right Side Start -->
+                        <div class="select-shoing-wrap d-flex align-items-center">
+                            <div class="shot-product">
+                                <p>Sort By:</p>
+                            </div>
+                            <div class="shop-select">
+                                <form id="filter-form" action="{% url 'products:shop' id %}?cat1=true&search={{search}}&sort={{sort}}" method="get">
+                                    <select class="shop-sort" name="sort"  onchange="submitFilterForm(this)">
+                                        <option > Sort products</option>
+                                        <option {% if sort == "1" %}selected{% endif %} value="1"> Name, A to Z</option>
+                                        <option {% if sort == "2" %}selected{% endif %}  value="2"> Name, Z to A</option>
+                                        <option {% if sort == "3" %}selected{% endif %}  value="3"> Price, low to high</option>
+                                        <option {% if sort == "4" %}selected{% endif %}  value="4"> Price, high to low</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Right Side End -->
+                    </div>
+                    <!-- Shop Top Area End -->
+
+                    <!-- Shop Bottom Area Start -->
+                    <div class="shop-bottom-area">
+
+                        <!-- Tab Content Area Start -->
+                        <div class="row">
+                            <div class="col">
+                                <div class="tab-content">
+                                    <div class="tab-pane fade show active" id="shop-grid">
+                                        <div class="row mb-n-30px">
+                                            {% for product in products %}
+                                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6 mb-30px" data-aos="fade-up"
+                                                data-aos-delay="600">
+                                                <!-- Single Prodect -->
+                                                <div class="product">
+                                                    <div class="thumb">
+                                                        <a href="{% url 'products:shop_product_detail' product.id %}" class="image">
+                                                            
+                                                            {% with product_image=product.productimage_set.first %}
+                                                                {% if product_image %}
+                                                                    <img style="width:270px;height:310px !important"  {% if product.quantity > 0 %}{% else %} class="out-of-stock" {% endif %} src="{{ product_image.image.url }}" alt="{{ product.name }}" />
+                                                                {% else %}
+                                                                    <p>No image available</p>
+                                                                {% endif %}
+                                                            {% endwith %}
+
+                                                            {% with product_image=product.productimage_set.first %}
+                                                                {% if product_image %}
+                                                                    <img style="width:270px;height:310px !important"  class="hover-image {% if product.quantity > 0 %}{% else %} out-of-stock {% endif %}" src="{{ product_image.image.url }}"
+                                                                    alt="{{ product.name }}" />
+                                                                {% else %}
+                                                                    <p>No image available</p>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        </a>
+                                                        <span class="badges">
+                                                           
+                                                            <span class="sale"> 
+                                                                {% if product.calculate_discount_percentage == 0 %}
+                                                                {% else %}
+                                                                {{ product.calculate_discount_percentage|floatformat:1 }}%</span>
+                                                                {% endif %}
+                                                        </span>
+                                                        <div class="actions">
+                                                            {% comment %} <a href="{% url 'products:wishlist' %}" class="action wishlist"
+                                                                title="Wishlist"><i class="pe-7s-like"></i></a> {% endcomment %}
+                                                            {% comment %} <a href="#" class="action quickview"
+                                                                data-link-action="quickview" title="Quick view"
+                                                                data-bs-toggle="modal" data-bs-target="#exampleModal"><i
+                                                                    class="pe-7s-search"></i></a>
+                                                            <a href="compare.html" class="action compare"
+                                                                title="Compare"><i class="pe-7s-refresh-2"></i></a> {% endcomment %}
+                                                        </div>
+                                                        {% if product.quantity > 0 %}
+                                                        <a href="{% url 'products:shop_product_detail' product.id %}" title="View Details" class=" add-to-cart">View Details</a>
+                                                        {% else %}
+                                                            <a href="{% url 'products:shop_product_detail' product.id %}" title="View Details" class=" add-to-cart">Out of stock</a>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="content">
+                                                        <span class="ratings">
+                                                            <span class="rating-wrap">
+                                                                <span class="star" style="width: {{product.avg_rating}}%"></span>
+                                                            </span>
+                                                            <span class="rating-num">( {{product.rating_count}} Review )</span>
+                                                        </span>
+                                                        <h5 class="title"><a href="{% url 'products:shop_product_detail' product.id %}">{{product.name}}</a></h5>
+                                                        <span class="price">   
+                                                            {% if product.discount %} 
+                                                                <span class="new">${{product.discount}}</span>
+                                                                <span class="old">${{product.price}}</span>
+                                                            {% else %}
+                                                                <span class="new">${{product.price}}</span>
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="shop-list">
+                                        {% for product in products %}
+                                        
+                                        <div class="shop-list-wrapper">
+                                            <div class="row">
+                                                <div class="col-md-5 col-lg-5 col-xl-4">
+                                                    <div class="product">
+                                                        <div class="thumb">
+                                                            <a href="{% url 'products:shop_product_detail' product.id  %}" class="image">
+                                                                {% with product_image=product.productimage_set.first %}
+                                                                    {% if product_image %}
+                                                                        <img style="width:270px;height:310px !important" {% if product.quantity > 0 %}{% else %} class="out-of-stock" {% endif %}  src="{{ product_image.image.url }}" alt="{{ product.name }}" />
+                                                                    {% else %}
+                                                                        <p>No image available</p>
+                                                                    {% endif %}
+                                                                {% endwith %}
+
+                                                                {% with product_image=product.productimage_set.first %}
+                                                                    {% if product_image %}
+                                                                        <img   class="hover-image {% if product.quantity > 0 %}{% else %} out-of-stock {% endif %}" src="{{ product_image.image.url }}"  alt="{{ product.name }}" />
+                                                                    {% else %}
+                                                                        <p>No image available</p>
+                                                                    {% endif %}
+                                                                {% endwith %}
+                                                            </a>
+                                                            <span class="badges">
+                                                                <span class="sale">
+                                                                    {% if product.calculate_discount_percentage == 0 %}
+                                                                {% else %}
+                                                                {{ product.calculate_discount_percentage|floatformat:1 }}%</span>
+                                                                {% endif %}
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7 col-lg-7 col-xl-8">
+                                                    <div class="content-desc-wrap">
+                                                        <div class="content">
+                                                            <span class="ratings">
+                                                                <span class="rating-wrap">
+                                                                    <span class="star" style="width: {{product.avg_rating}}%"></span>
+                                                                </span>
+                                                                <span class="rating-num">( 0 Review  {{product.rating_count}} )</span>
+                                                            </span>
+                                                            <h5 class="title"><a href="{% url 'products:shop_product_detail' product.id %}">{{ product.name }}</a></h5>
+                                                            <p>{{product.description | truncatechars:200}}</p>
+                                                        </div>
+                                                        <div class="box-inner">
+                                                            <span class="price">
+                                                                {% if product.discount %} 
+                                                                    <span class="new">${{product.discount}}</span>
+                                                                    <span class="old">${{product.price}}</span>
+                                                                {% else %}
+                                                                    <span class="new">${{product.price}}</span>
+                                                                {% endif %}
+                                                            </span>
+                                                            <div class="actions">
+                                                                {% comment %} <a href="{% url 'products:wishlist' %}" class="action wishlist"
+                                                                    title="Wishlist"><i class="pe-7s-like"></i></a> {% endcomment %}
+                                                                {% comment %} <a href="#" class="action quickview"
+                                                                    data-link-action="quickview" title="Quick view"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#exampleModal"><i
+                                                                        class="pe-7s-search"></i></a>
+                                                                <a href="compare.html" class="action compare"
+                                                                    title="Compare"><i class="pe-7s-refresh-2"></i></a> {% endcomment %}
+                                                            </div>
+                                                            {% if product.quantity > 0 %}
+                                                            <a href="{% url 'products:shop_product_detail' product.id %}" title="View Details" class=" add-to-cart">View Details</a>
+                                                            {% else %}
+                                                                <a href="{% url 'products:shop_product_detail' product.id %}" title="View Details" class=" add-to-cart">Out of stock</a>
+                                                            {% endif %}                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                   
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tab Content Area End -->
+
+                        <!--  Pagination Area Start -->
+                        {% comment %} <div class="load-more-items text-center mb-md-60px mb-lm-60px mt-30px0px" data-aos="fade-up">
+                            <a href="#" class="btn btn-lg btn-primary btn-hover-dark m-auto"> Load More <i
+                                    class="fa fa-refresh ml-15px" aria-hidden="true"></i></a>
+                        </div> {% endcomment %}
+                        <!--  Pagination Area End -->
+                    </div>
+                    <!-- Shop Bottom Area End -->
+                </div>
+                <!-- Sidebar Area Start -->
+                <div class="col-lg-3 order-lg-first col-md-12 order-md-last mb-md-60px mb-lm-60px">
+                    <div class="shop-sidebar-wrap">
+                        <!-- Sidebar single item -->
+                        
+                        <div class="sidebar-widget-search">
+                            <form id="widgets-searchbox" action="{% url 'products:shop' id %}?cat1=true&search={{search}}&sort={{sort}}">
+                                <input class="input-field" type="text" name="search" value="{{search}}" placeholder="Search">
+                                <button class="widgets-searchbox-btn" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <!-- Sidebar single item -->
+                        <form id="filter-price" action="{% url 'products:shop' id %}?cat1=true&search={{search}}&sort={{sort}}&cat={{cat}}" method="get">
+                            <div class="sidebar-widget mt-8">
+                                <h4 class="sidebar-title">Price Filter</h4>
+                                <div class="price-filter">
+                                    <div class="price-slider-amount">
+                                        <input type="text" id="amount" class="p-0 h-auto lh-1" name="price" placeholder="Add Your Price">
+                                    </div>
+                                    <div id="slider-range" class="ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content">
+                                        <div class="ui-slider-range ui-corner-all ui-widget-header" style="left: 0%; width: 100%;"></div>
+                                        <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 0%;"></span>
+                                        <span tabindex="20" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 100%;"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- Sidebar single item -->
+                        <div class="sidebar-widget">
+                            <h4 class="sidebar-title">Category</h4>
+                            <div class="sidebar-widget-category">
+                                <ul>
+                                    {% for sub_cat_id,sub_cat_name,subcat_items in subcat %}
+                                        <li><a href="{% url 'products:shop' id %}?cat1=true&search={{search}}&sort={{sort}}&cat={{sub_cat_id}}" class="selected m-1">{{sub_cat_name}} <span>({{subcat_items}})</span> </a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Sidebar single item -->
+                        {% comment %} <div class="sidebar-widget">
+                            <h4 class="sidebar-title">Color</h4>
+                            <div class="sidebar-widget-list color">
+                                <ul>
+                                    <li><a class="active yellow" href="#"></a></li>
+                                    <li><a class="black" href="#"></a></li>
+                                    <li><a class="red" href="#"></a></li>
+                                    <li><a class="pink" href="#"></a></li>
+                                </ul>
+                            </div>
+                        </div> {% endcomment %}
+                        <!-- Sidebar single item -->
+                        <div class="sidebar-widget">
+                            <h4 class="sidebar-title">Size</h4>
+                            <div class="sidebar-widget-tag">
+                                <ul>
+                                    {% for i in size %}
+                                    <li><a class="active-2 gray" href="{% url 'products:shop' id %}?cat1=true&search={{search}}&sort={{sort}}&cat={{sub_cat_id}}&size={{i.id}}">{{i.name}}</a></li>
+                                    {% endfor %}
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                        </form>
+                        <!-- Sidebar single item -->
+                        {% comment %} <div class="sidebar-widget tag">
+                            <h4 class="sidebar-title">Tags</h4>
+                            <div class="sidebar-widget-tag">
+                                <ul>
+                                    <li><a href="#">Fashion</a></li>
+                                    <li><a href="#">Organic</a></li>
+                                    <li><a href="#">Old Fashion</a></li>
+                                    <li><a href="#">Men</a></li>
+                                    <li><a href="#">Fashion</a></li>
+                                    <li><a href="#">Dress</a></li>
+                                </ul>
+                            </div>
+                        </div> {% endcomment %}
+                        <!-- Sidebar single item -->
+                        <div class="sidebar-widget-image">
+                            <div class="single-banner">
+                                <img src="{% static 'assets/images/banner/2.png' %}" alt="">
+                                <div class="item-disc">
+                                    <h2 class="title">#bestsellers</h2>
+                                    <a href="" class="shop-link">Shop Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Sidebar single item -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Shop Page End  -->
+    {% include 'frontend/includes/footer.html' %}
+    
+    <script>
+        function submitFilterForm(selectElement) {
+            selectElement.closest('form').submit();
+        }
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Initialize the slider
+            $("#slider-range").slider({
+                range: true,
+                min: 0,
+                max: 7000, // Set your maximum price range value
+                values: [{{s_p}}, {{l_p}}], // Initial values
+                slide: function(event, ui) {
+                    $("#amount").val("" + ui.values[0] + "-" + ui.values[1]);
+                },
+                change: function(event, ui) {
+                    // Submit the form when slider value changes
+                    $("#filter-price").submit();
+                }
+            });
+            
+            // Initialize the input value based on the initial slider values
+            const initialValues = $("#slider-range").slider("values");
+            $("#amount").val("$" + initialValues[0] + " - $" + initialValues[1]);
+        });
+    </script>
+    
+    
